@@ -1,9 +1,15 @@
 # Automated Compliance Marketing System
 ## Web App. Dev. Architecture
 ### Frontend
+- xxx
+- xxx
 
 ### Backend
 #### Storage
+- S3
+- SQL : PostgreSQL/AWS Aurora
+- NoSQL :
+- 
 #### Vectorstore
 - ChromaDB : (Integration with either SQLite/PostgreSQL)
 #### GenAI API
