@@ -8,7 +8,7 @@ def init_ollama():
     return Ollama(model="llama3.2")  # or whatever model you have installed
 
 # Create the Streamlit interface
-st.title('Sandbox for Marketing Materials Compliance Analysis')
+st.title('Sandbox for General Chatbot')
 
 # Initialize chat history in session state if it doesn't exist
 if 'messages' not in st.session_state:
