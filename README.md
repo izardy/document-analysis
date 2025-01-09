@@ -1,7 +1,7 @@
 # Automated Compliance Marketing System
 ## Web App. Dev. Architecture
 ### Frontend
-- xxx
+- Streamlit for experimentation purpose
 - xxx
 
 ### Backend
