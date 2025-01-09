@@ -1,1 +1,8 @@
+### Install Ollama
+- Linux
+```
+```
+- Windows
+```
+```
 
