@@ -6,7 +6,7 @@ import base64
 import io
 
 def init_ollama():
-    return Ollama(model="llava-phi3")
+    return Ollama(model="llama3.2-vision:11b")
 
 def extract_text_from_pdf(pdf_file):
     pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -15,29 +15,33 @@ def extract_text_from_pdf(pdf_file):
         text += page.extract_text() + "\n"
     return text
 
-def image_to_base64(image):
-    # Convert PIL Image to base64 string
-    buffered = io.BytesIO()
-    image.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode()
-    return img_str
-
 def describe_image(image_file):
-    # Open and process the image
-    image = Image.open(image_file)
+    try:
+        # Open and process the image
+        image = Image.open(image_file)
+        
+        # Convert PIL Image to base64 string
+        buffered = io.BytesIO()
+        image.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
+        # Create a more detailed prompt
+        prompt = ("Provide a detailed description of this image, including: "
+                 "main subjects, colors, composition, lighting, setting, "
+                 "and any notable details or activities shown.")
     
-    # Convert image to base64
-    base64_image = image_to_base64(image)
-    
-    # Create prompt for image description
-    prompt = "Please describe this image in detail."
-    
-    # Initialize Ollama with vision model
-    llm = init_ollama()
-    
-    # Get image description using base64 image
-    description = llm(prompt, images=[f"data:image/jpeg;base64,{base64_image}"])
-    return description
+        try:
+            # Initialize Ollama with vision model
+            llm = init_ollama()
+            
+            # Pass the base64 encoded image string
+            description = llm(prompt, images=[img_str])
+            return description
+        except Exception as e:
+            raise Exception(f"Error generating description: {str(e)}")
+            
+    except Exception as e:
+        raise Exception(f"Error loading image: {str(e)}")
 
 # Create the Streamlit interface
 st.title('Sandbox for Marketing Materials Compliance Analysis')
