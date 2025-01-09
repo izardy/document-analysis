@@ -1,14 +1,3 @@
-### Install Ollama
-- Linux
-```
-```
-- Windows
-```
-```
-### Create App. Env
-```
-```
-
 ### Run Streamlit App
 - Example on how to run a Streamlit py file
 ```
