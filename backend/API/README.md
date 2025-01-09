@@ -70,3 +70,53 @@ else:
 
 ```flush=True:```
 > By default, Python buffers the output (stores it temporarily) before actually displaying it and forces Python to immediately display the output .This is particularly important for streaming responses where you want to see the text appear in real-time.
+- Concatenate "curl" via JS
+```
+const fetch = require('node-fetch');
+
+const url = 'http://localhost:11434/api/generate';
+const payload = {
+    model: 'llama3.2',
+    prompt: 'Why is the sky blue?'
+};
+
+async function generateResponse() {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            // Handle streaming response
+            const reader = response.body;
+            for await (const chunk of reader) {
+                const lines = chunk.toString().split('\n');
+                
+                for (const line of lines) {
+                    if (line.trim()) {
+                        try {
+                            const data = JSON.parse(line);
+                            if (data.response) {
+                                process.stdout.write(data.response);
+                            }
+                        } catch (error) {
+                            continue;
+                        }
+                    }
+                }
+            }
+        } else {
+            console.log(`Request failed with status code: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+generateResponse();
+
+```
