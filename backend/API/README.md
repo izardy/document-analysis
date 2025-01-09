@@ -120,3 +120,7 @@ async function generateResponse() {
 generateResponse();
 
 ```
+> Install ```node-fetch``` package before running the code
+```
+npm install node-fetch
+```
