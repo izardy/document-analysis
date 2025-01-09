@@ -124,3 +124,23 @@ generateResponse();
 ```
 npm install node-fetch
 ```
+> Initialize node.js project , a ```package.json``` file will be generate
+```
+mkdir ollama-api-test-js
+cd ollama-api-test-js
+npm init -y
+```
+> Add ```ollama-api-test.js``` to ```package.json``` file
+```
+{
+  "name": "ollama-api-test-js",
+  "version": "1.0.0",
+  "main": "ollama-api-test.js",
+  "scripts": {
+    "start": "node ollama-api-test.js"
+  },
+  "dependencies": {}
+}
+
+```
+> Run script ```npm start```
