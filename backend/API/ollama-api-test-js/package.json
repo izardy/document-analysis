@@ -1,0 +1,12 @@
+{
+  "name": "ollama-api-test-js",
+  "version": "1.0.0",
+  "main": "node ollama-api-test.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ollama-api-test.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

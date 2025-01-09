@@ -1,6 +1,6 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-const url = 'http://localhost:11434/api/generate';
+const url = 'http://127.0.0.1:11434/api/generate';
 const payload = {
     model: 'llama3.2',
     prompt: 'Why is the sky blue?'
