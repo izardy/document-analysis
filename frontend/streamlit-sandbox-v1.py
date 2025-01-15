@@ -6,7 +6,7 @@ import base64
 import io
 
 def init_ollama():
-    return Ollama(model="llama3.2-vision:11b")
+    return Ollama(model="llama3.2:latest")
 
 def extract_text_from_pdf(pdf_file):
     pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -81,6 +81,8 @@ if uploaded_file is not None:
             "role": "assistant", 
             "content": f"Analysis of uploaded file:\n\n{response}"
         })
+
+        st.session_state.uploaded_file = None
         
     except Exception as e:
         st.error(f"Error processing file: {str(e)}")

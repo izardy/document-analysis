@@ -1,36 +1,92 @@
-import streamlit as st
-from langchain_community.llms import Ollama
 from openai import OpenAI
-import os
-from PIL import Image
 import PyPDF2
-import base64
-import io
+import os
 from dotenv import load_dotenv
+import base64
+import streamlit as st
 
-# Load environment variables from .env file
 load_dotenv()
 
-def optimize_image(image, max_size=(400, 400)):
-    """Optimize image size and quality for API processing"""
-    # Calculate aspect ratio-preserving dimensions
-    img_width, img_height = image.size
-    ratio = min(max_size[0] / img_width, max_size[1] / img_height)
-    new_size = (int(img_width * ratio), int(img_height * ratio))
-    
-    # Resize image
-    image = image.resize(new_size, Image.Resampling.LANCZOS)
-    
-    # Convert to RGB if image is in RGBA mode
-    if image.mode == 'RGBA':
-        image = image.convert('RGB')
-    
-    return image
+def encode_image_to_base64(uploaded_file):
+    return base64.b64encode(uploaded_file.getvalue()).decode('utf-8')
 
-def init_openai_vision():
-    # Initialize the OpenAI client with API key from environment variable
-    client = OpenAI(api_key=os.getenv("API_KEY"))
-    return client
+def describe_image(uploaded_file):
+    try:
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        
+        # Validate API key
+        if not os.getenv("OPENAI_API_KEY"):
+            raise ValueError("OpenAI API key not found in environment variables")
+            
+        # Validate uploaded file
+        if uploaded_file is None:
+            raise ValueError("No image file is uploaded")
+
+        # Convert the uploaded file to base64
+        base64_image = encode_image_to_base64(uploaded_file)
+
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",  # Using the correct model for vision
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Describe this image in detail."},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                            },
+                        },
+                    ],
+                }
+            ],
+            max_tokens=300,
+        )
+        
+        return response.choices[0].message.content
+        
+    except Exception as e:
+        raise Exception(f"Error describing image: {str(e)}")
+    
+def extract_text_from_img(image_path):
+    try:
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        
+        # Validate API key
+        if not os.getenv("OPENAI_API_KEY"):
+            raise ValueError("OpenAI API key not found in environment variables")
+            
+        # Validate image path
+        if not image_path:
+            raise ValueError("Image path cannot be empty")
+
+        # Convert the image to base64
+        base64_image = encode_image_to_base64(image_path)
+
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",  # Using the correct model for vision
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Extract text from this image only. Do not include any other information."},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                            },
+                        },
+                    ],
+                }
+            ],
+            max_tokens=300,
+        )
+        
+        return response.choices[0].message.content
+        
+    except Exception as e:
+        raise Exception(f"Error describing image: {str(e)}")
 
 # extract text from pdf file
 def extract_text_from_pdf(pdf_file):
@@ -45,70 +101,6 @@ def extract_text_from_txt(txt_file):
     text = txt_file.read().decode('utf-8')
     return text
 
-# extract text from image file
-def extract_text_from_img(image_file):
-    # Open and process the image
-    image = Image.open(image_file)
-
-    # Optimize the image
-    image = optimize_image(image)
-
-    # Convert PIL Image to base64 string
-    buffered = io.BytesIO()
-    image.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-    
-    # Create prompt to extract text from image only
-    prompt = ("Extract text from this image only. "
-              "Do not include any other information.")
-    
-    try:
-        # Initialize Ollama with vision model
-        #llm = init_ollama_vision()
-        llm = init_openai_vision()
-        description=llm.chat.completions.create(model="gpt-4-turbo", messages=[{"role": "user", "content": [prompt,img_str]}], max_tokens=500)
-
-        # Pass the base64 encoded image string
-        # description = llm(prompt, images=[img_str])
-        return description
-    except Exception as e:
-        raise Exception(f"Error generating description: {str(e)}")
-
-# uploaded image description
-def describe_image(image_file):
-    try:
-        # Open and process the image
-        image = Image.open(image_file)
-
-        # Optimize the image
-        image = optimize_image(image)
-        
-        # Convert PIL Image to base64 string
-        buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-        
-        # Create a more detailed prompt
-        prompt = ("Provide a detailed description of this image, including: "
-                 "main subjects, colors, composition, lighting, setting, "
-                 "and any notable details or activities shown.")
-    
-        try:
-            # Initialize Ollama with vision model
-            # llm = init_ollama_vision()
-
-            llm = init_openai_vision()
-            description=llm.chat.completions.create(model="gpt-4-turbo", messages=[{"role": "user", "content": [prompt,img_str]}], max_tokens=500)
-            
-            # Pass the base64 encoded image string (Ollama)
-            # description = llm(prompt, images=[img_str])
-            return description
-        except Exception as e:
-            raise Exception(f"Error generating description: {str(e)}")
-            
-    except Exception as e:
-        raise Exception(f"Error loading image: {str(e)}")
-
 # Create the Streamlit interface
 st.title('Sandbox for Marketing Materials Compliance Analysis')
 
@@ -120,6 +112,7 @@ if 'messages' not in st.session_state:
 uploaded_file = st.file_uploader("Upload a Text, PDF or Image file", type=['txt' ,'pdf', 'png', 'jpg', 'jpeg'])
 
 if uploaded_file is not None:
+    
     try:
         # Process based on file type
         file_type = uploaded_file.type
@@ -131,9 +124,17 @@ if uploaded_file is not None:
             # Create prompt for summarization
             prompt = f"Please summarize the following text:\n\n{text_content}"
             
-            # Generate summary using Ollama
-            llm = init_ollama_text()
-            response = llm(prompt)        
+            # Generate summary using OpenAI
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            response_txt=client.chat.completions.create(model="gpt-4-turbo", 
+                                                    messages=[{"role": "user", "content": [{"type": "text","text":prompt},]}], 
+                                                    max_tokens=500).choices[0].message.content
+
+            # Add the response to chat history of uploaded txt
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": f"Summary of the uploaded text file:\n\n{response_txt}"
+            })
 
         if 'pdf' in file_type:
             text_content = extract_text_from_pdf(uploaded_file)
@@ -142,9 +143,17 @@ if uploaded_file is not None:
             # Create prompt for summarization
             prompt = f"Please summarize the following text:\n\n{text_content}"
             
-            # Generate summary using Ollama
-            llm = init_ollama_text()
-            response = llm(prompt)
+            # Generate summary using OpenAI
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            response_pdf=client.chat.completions.create(model="gpt-4-turbo", 
+                                                    messages=[{"role": "user", "content": [{"type": "text","text":prompt},]}], 
+                                                    max_tokens=500).choices[0].message.content  
+            
+            # Add the response to chat history of uploaded pdf
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": f"Summary of the uploaded pdf file:\n\n{response_pdf}"
+            })
             
         elif 'image' in file_type:
             # Display the uploaded image
@@ -155,16 +164,16 @@ if uploaded_file is not None:
             response_img_txt = extract_text_from_img(uploaded_file)
             st.success("Image processed successfully!")
         
-        # Add the response to chat history
-        st.session_state.messages.append({
-            "role": "assistant", 
-            "content": f"Analysis of uploaded file:\n\n{response_img_describe}"
-        })
+            # Add the response to chat history of uploaded image
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": f"Analysis of uploaded file:\n\n{response_img_describe}"
+            })
 
-        st.session_state.messages.append({
-            "role": "assistant", 
-            "content": f"Text extracted from uploaded file:\n\n{response_img_txt}"
-        })
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": f"Text extracted from uploaded file:\n\n{response_img_txt}"
+            })
         
     except Exception as e:
         st.error(f"Error processing file: {str(e)}")
@@ -185,18 +194,20 @@ if prompt := st.chat_input("Ask questions about the uploaded content"):
 
     # Generate response
     try:
-        llm = init_ollama()
-        response = llm(prompt)
+        #client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response_follow_up=client.chat.completions.create(model="gpt-4-turbo", 
+                                                messages=[{"role": "user", "content": [{"type": "text","text":prompt},]}], 
+                                                max_tokens=500).choices[0].message.content 
 
         # Display assistant response
         with st.chat_message("assistant"):
-            st.markdown(response)
+            st.markdown(response_follow_up)
         
         # Add assistant response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.session_state.messages.append({"role": "assistant", "content": response_follow_up})
     
     except Exception as e:
-        st.error(f"Error communicating with Ollama: {str(e)}")
+        st.error(f"Error communicating with OpenAI API: {str(e)}")
 
 # Add a button to clear chat history
 if st.button("Clear Chat History"):
