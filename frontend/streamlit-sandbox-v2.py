@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-def optimize_image(image, max_size=(300, 300)):
+def optimize_image(image, max_size=(400, 400)):
     """Optimize image size and quality for API processing"""
     # Calculate aspect ratio-preserving dimensions
     img_width, img_height = image.size
@@ -27,16 +27,10 @@ def optimize_image(image, max_size=(300, 300)):
     
     return image
 
-def init_ollama_vision():
-    return Ollama(model="llama3.2-vision:11b")
-
 def init_openai_vision():
     # Initialize the OpenAI client with API key from environment variable
     client = OpenAI(api_key=os.getenv("API_KEY"))
     return client
-
-def init_ollama_text():
-    return Ollama(model="llama3.2:latest")
 
 # extract text from pdf file
 def extract_text_from_pdf(pdf_file):
