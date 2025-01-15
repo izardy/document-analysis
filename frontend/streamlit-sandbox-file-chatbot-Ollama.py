@@ -9,27 +9,52 @@ import io
 import os
 import json
 
+
+import subprocess
+
+try:
+    result = subprocess.run(["ollama", "list"], text=True, capture_output=True)
+    print(result.stdout)  # Prints the output of the command
+except Exception as e:
+    print(f"Error executing command: {e}")
+
+# export to list
+output=result.stdout.split('\n')
+
+models = []
+
+for model in output[1:-1]:
+    #remove 8 characters from the beginning of the string
+    model=model[:-42].strip()
+    models.append(model)
+
 # File to store chat history
 HISTORY_FILE = "chat_history.json"
 
-# Initialize Ollama with conversation memory
+# Initialize Conversation Chain
 def init_conversation():
-    llm = Ollama(model="llama3.2")
-    memory = ConversationBufferMemory()
-    
-    # If there's existing chat history, load it into memory
-    if st.session_state.messages:
+    # Add a selectbox for model selection in the sidebar
+    available_models = models
+    selected_model = st.sidebar.selectbox(
+        "Choose a model",
+        available_models,
+        index=0,  # Default model
+    )
+
+    # Initialize the LLM with selected model
+    llm = Ollama(model=f"{selected_model}")
+    memory = st.session_state.memory
+
+    # Load existing chat history into memory
+    if not memory.chat_memory.messages:
         for message in st.session_state.messages:
             if message["role"] == "user":
                 memory.chat_memory.add_user_message(message["content"])
             elif message["role"] == "assistant":
                 memory.chat_memory.add_ai_message(message["content"])
-                
-    return ConversationChain(
-        llm=llm,
-        memory=memory,
-        verbose=True
-    )
+    
+    return ConversationChain(llm=llm, memory=memory, verbose=True)
+
 
 # Load chat history from file
 def load_chat_history():
@@ -46,7 +71,7 @@ def save_chat_history(messages):
     with open(HISTORY_FILE, 'w') as f:
         json.dump(messages, f)
 
-# Text extraction from PDF
+# Extract text from PDF
 def extract_text_from_pdf(pdf_file):
     pdf_reader = PyPDF2.PdfReader(pdf_file)
     text = ""
@@ -54,127 +79,99 @@ def extract_text_from_pdf(pdf_file):
         text += page.extract_text() + "\n"
     return text
 
-# Text extraction from image
-# code #
-
-# Text description from image
+# Describe image
 def describe_image(image_file):
     try:
-        # Open and process the image
         image = Image.open(image_file)
-        
-        # Convert PIL Image to base64 string
         buffered = io.BytesIO()
         image.save(buffered, format="PNG")
         img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
-        # Create a more detailed prompt
         prompt = ("Provide a detailed description of this image, including: "
-                 "main subjects, colors, composition, lighting, setting, "
-                 "and any notable details or activities shown.")
-    
-        try:
-            # Initialize Ollama with vision model
-            llm = init_conversation()
-            
-            # Pass the base64 encoded image string
-            description = llm(prompt, images=[img_str])
-            return description
-        except Exception as e:
-            raise Exception(f"Error generating description: {str(e)}")
-            
+                  "main subjects, colors, composition, lighting, setting, "
+                  "and any notable details or activities shown.")
+        
+        llm = st.session_state.conversation.llm
+        description = llm(prompt, images=[img_str])
+        return description
     except Exception as e:
-        raise Exception(f"Error loading image: {str(e)}")
+        raise Exception(f"Error processing image: {str(e)}")
 
-# Create the Streamlit interface
-st.title('Sandbox for Marketing Materials Compliance Analysis')
+# Initialize Streamlit app
+st.title("Sandbox for Marketing Materials Compliance Analysis")
 
-# Initialize chat history in session state if it doesn't exist
+# Initialize session state
 if 'messages' not in st.session_state:
     st.session_state.messages = load_chat_history()
-
-# Initialize conversation chain in session state
+if 'memory' not in st.session_state:
+    st.session_state.memory = ConversationBufferMemory()
 if 'conversation' not in st.session_state:
     st.session_state.conversation = init_conversation()
+if 'file_processed' not in st.session_state:
+    st.session_state.file_processed = False
+if 'file_response' not in st.session_state:
+    st.session_state.file_response = None
 
-# Add a clear history button
+# Clear chat history button
 if st.button("Clear Chat History"):
     st.session_state.messages = []
+    st.session_state.memory.chat_memory.clear()
+    st.session_state.file_processed = False
+    st.session_state.file_response = None
     save_chat_history([])
-    # Reinitialize conversation with empty memory
-    st.session_state.conversation = init_conversation()
     st.rerun()
-
-####################################################################################################
 
 # File uploader
 uploaded_file = st.file_uploader("Upload a PDF or Image file", type=['pdf', 'png', 'jpg', 'jpeg'])
 
-if uploaded_file is not None:
+# Process the file only once
+if uploaded_file is not None and not st.session_state.file_processed:
     try:
-        # Process based on file type
         file_type = uploaded_file.type
         if 'pdf' in file_type:
             text_content = extract_text_from_pdf(uploaded_file)
             st.success("PDF processed successfully!")
             
-            # Create prompt for summarization
             prompt = f"Please summarize the following text:\n\n{text_content}"
-            
-            # Generate summary using Ollama
-            llm = init_conversation()
-            response = llm(prompt)
-            
+            response = st.session_state.conversation.predict(input=prompt)
+        
         elif 'image' in file_type:
-            # Display the uploaded image
             st.image(uploaded_file, caption="Uploaded Image")
-            
-            # Get image description
             response = describe_image(uploaded_file)
             st.success("Image processed successfully!")
         
-        # Add the response to chat history
-        st.session_state.messages.append({
-            "role": "assistant", 
-            "content": f"Analysis of the uploaded file:\n\n{response['response']}"
-        })
+        # Save the file response in session state
+        st.session_state.file_response = response
+        st.session_state.file_processed = True
 
-        # Display chat history
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-                
+        # Add response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.session_state.memory.chat_memory.add_ai_message(response)
+        save_chat_history(st.session_state.messages)
+
     except Exception as e:
         st.error(f"Error processing file: {str(e)}")
 
-
-####################################################################################################
+# Display file response if already processed
+if st.session_state.file_response:
+    st.markdown(f"**Analysis of the uploaded file:**\n\n{st.session_state.file_response}")
 
 # Chat input for follow-up questions
 if prompt := st.chat_input("Ask questions about the uploaded content"):
-    # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state.memory.chat_memory.add_user_message(prompt)
     
-    # Display user message
     with st.chat_message("user"):
         st.markdown(prompt)
-
-    # Generate response
+    
     try:
-        # Get response from conversation chain instead of direct LLM call
         response = st.session_state.conversation.predict(input=prompt)
-
-        # Display assistant response
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.session_state.memory.chat_memory.add_ai_message(response)
+        
         with st.chat_message("assistant"):
             st.markdown(response)
         
-        # Add assistant response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        
-        # Save updated chat history
         save_chat_history(st.session_state.messages)
-    
     except Exception as e:
         st.error(f"Error communicating with Ollama: {str(e)}")
-
-

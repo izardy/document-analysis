@@ -4,28 +4,50 @@ from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
 import json
 import os
+import subprocess
+
+try:
+    result = subprocess.run(["ollama", "list"], text=True, capture_output=True)
+    print(result.stdout)  # Prints the output of the command
+except Exception as e:
+    print(f"Error executing command: {e}")
+
+# export to list
+output=result.stdout.split('\n')
+
+models = []
+
+for model in output[1:-1]:
+    #remove 8 characters from the beginning of the string
+    model=model[:-42].strip()
+    models.append(model)
 
 # File to store chat history
 HISTORY_FILE = "chat_history.json"
 
-# Initialize Ollama with conversation memory
+# Initialize Conversation Chain
 def init_conversation():
-    llm = Ollama(model="llama3.2")
-    memory = ConversationBufferMemory()
-    
-    # If there's existing chat history, load it into memory
-    if st.session_state.messages:
+    # Add a selectbox for model selection in the sidebar
+    available_models = models
+    selected_model = st.sidebar.selectbox(
+        "Choose a model",
+        available_models,
+        index=0,  # Default model
+    )
+
+    # Initialize the LLM with selected model
+    llm = Ollama(model=f"{selected_model}")
+    memory = st.session_state.memory
+
+    # Load existing chat history into memory
+    if not memory.chat_memory.messages:
         for message in st.session_state.messages:
             if message["role"] == "user":
                 memory.chat_memory.add_user_message(message["content"])
             elif message["role"] == "assistant":
                 memory.chat_memory.add_ai_message(message["content"])
-                
-    return ConversationChain(
-        llm=llm,
-        memory=memory,
-        verbose=True
-    )
+    
+    return ConversationChain(llm=llm, memory=memory, verbose=True)
 
 # Load chat history from file
 def load_chat_history():
@@ -45,13 +67,17 @@ def save_chat_history(messages):
 # Create the Streamlit interface
 st.title('Sandbox for General Chatbot')
 
-# Initialize chat history in session state if it doesn't exist
+# Initialize session state
 if 'messages' not in st.session_state:
     st.session_state.messages = load_chat_history()
-
-# Initialize conversation chain in session state
+if 'memory' not in st.session_state:
+    st.session_state.memory = ConversationBufferMemory()
 if 'conversation' not in st.session_state:
     st.session_state.conversation = init_conversation()
+if 'file_processed' not in st.session_state:
+    st.session_state.file_processed = False
+if 'file_response' not in st.session_state:
+    st.session_state.file_response = None
 
 # Add a clear history button
 if st.button("Clear Chat History"):
