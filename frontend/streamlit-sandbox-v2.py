@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-def optimize_image(image, max_size=(290, 290)):
+def optimize_image(image, max_size=(300, 300)):
     """Optimize image size and quality for API processing"""
     # Calculate aspect ratio-preserving dimensions
     img_width, img_height = image.size
@@ -72,7 +72,7 @@ def extract_text_from_img(image_file):
         # Initialize Ollama with vision model
         #llm = init_ollama_vision()
         llm = init_openai_vision()
-        description=llm.chat.completions.create(model="gpt-4", messages=[{"role": "user", "content": [prompt,img_str]}], max_tokens=500)
+        description=llm.chat.completions.create(model="gpt-4-turbo", messages=[{"role": "user", "content": [prompt,img_str]}], max_tokens=500)
 
         # Pass the base64 encoded image string
         # description = llm(prompt, images=[img_str])
@@ -104,7 +104,7 @@ def describe_image(image_file):
             # llm = init_ollama_vision()
 
             llm = init_openai_vision()
-            description=llm.chat.completions.create(model="gpt-4", messages=[{"role": "user", "content": [prompt,img_str]}], max_tokens=500)
+            description=llm.chat.completions.create(model="gpt-4-turbo", messages=[{"role": "user", "content": [prompt,img_str]}], max_tokens=500)
             
             # Pass the base64 encoded image string (Ollama)
             # description = llm(prompt, images=[img_str])
