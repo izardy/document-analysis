@@ -98,7 +98,7 @@ def describe_image(image_file):
         raise Exception(f"Error processing image: {str(e)}")
 
 # Initialize Streamlit app
-st.title("Sandbox for Marketing Materials Compliance Analysis")
+st.title("Sandbox for Digital Document Content Analysis")
 
 # Initialize session state
 if 'messages' not in st.session_state:
