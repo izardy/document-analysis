@@ -1,26 +1,53 @@
 # Use Case for Digital Document AI Analysis Tool
-## 1. Local Chatbot Companion (No Documentation Upload)
+## 1. Local Chatbot Companion 
 - [x] Started
 - [x] Progressing
 - [x] Completed
 ### Business Logic Flow
->
+```
 ---Tipical Office Worker
       |--- 1. Email Crafting
       |--- 2. Document summarization
       |--- 3. Code Assistance
       |--- 4. Discussion on new ideas
-
+```
 ### AI Logic Flow
 ```
 --- Install Ollama (as the local AI server)
-      |--- 1. Pull
+      |--- 1. Check how to install here https://ollama.com/download
+      |--- 2. Download the model via terminal (smallest model as it could fit to less performance device), run this code "ollama run llama3.2:1b"
+      |--- 3. For those with GPU support machine (preferably 12Gb of VRAM) , can try to use AI with vision capability, run this code "ollama run llama3.2-vision"
+      |--- 4. Straight Q&A from terminal
+      |--- 5. If need to run from web interface read "How to Use?" section
+              |--- Use case 1 : Chat only w/o documentation
+              |--- Use case 2 : Chat with documentation upload (txt, pdf, jpg, png)
 ```
-## 2. Compliance on Digital Documents for Social Media Marketing
-### Business Logic Flow
+## 2. API Chatbot Companion 
 - [x] Started
 - [x] Progressing
-- [x] Completed
+- [ ] Completed
+### Business Logic Flow
+```
+---Tipical Office Worker
+      |--- 1. Email Crafting
+      |--- 2. Document summarization
+      |--- 3. Code Assistance
+      |--- 4. Discussion on new ideas
+```
+### AI Logic Flow
+```
+--- Subscribe AI API (OpenAI, Claude, Bedrock, etc)
+      |--- 1. Create the API key, store the key in .env file
+      |--- 2. Load the API in the code and specify the model, for OpenAI GPT-4-turbo is the cheapest.
+      |--- 3. GPT-4-turbo also have the vision capability, however for more advance model you can use GPT-4o
+      |--- 4. Read "How to Use?" section on how to run this on web interface
+
+```
+## 3. Compliance on Digital Documents for Social Media Marketing
+### Business Logic Flow
+- [ ] Started
+- [ ] Progressing
+- [ ] Completed
 ```
 ---Marketing Team
       |--- 1. Generation of Marketing Materials
@@ -36,7 +63,9 @@
       |            |--- Approve (Notifiying email to approve for publishing in media [3]) 
       |
       |-- 3. Publish Marketing Materials
-
+```
+### AI Logic Flow
+```
 ```
 ## 3. ....
 ### Business Logic Flow
