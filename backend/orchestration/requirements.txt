@@ -1,0 +1,7 @@
+boto3
+langchain 
+langchain_aws 
+mypy-boto3-bedrock-runtime
+pydantic
+fastapi
+uvicorn
