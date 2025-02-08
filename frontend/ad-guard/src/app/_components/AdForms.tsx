@@ -45,6 +45,9 @@ export function AdForms() {
       message: "Visual descriptions must be at least 2 characters.",
     }),
     disclaimers: z.string().optional(),
+    content: z.string().min(2, {
+      message: "Content must be at least 2 characters.",
+    }),
     key_opinion_leader: z.object({
       involved: z.boolean(),
       details: z.string().optional(),
@@ -66,6 +69,7 @@ export function AdForms() {
       caption: "",
       visual_descriptions: "",
       disclaimers: "",
+      content: "",
       key_opinion_leader: {
         involved: false,
         details: "",
@@ -83,12 +87,15 @@ export function AdForms() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-2 gap-4"
+      >
         <FormField
           control={form.control}
           name="campaign_name"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-1">
               <FormLabel>Campaign Name</FormLabel>
               <FormControl>
                 <Input placeholder="Enter campaign name" {...field} />
@@ -99,22 +106,23 @@ export function AdForms() {
         />
         <FormField
           control={form.control}
-          name="target_audience"
+          name="caption"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Target Audience</FormLabel>
+            <FormItem className="col-span-1">
+              <FormLabel>Caption</FormLabel>
               <FormControl>
-                <Input placeholder="Enter target audience" {...field} />
+                <Input placeholder="Enter caption" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="platform"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-1">
               <FormLabel>Platform</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
@@ -143,12 +151,45 @@ export function AdForms() {
         />
         <FormField
           control={form.control}
-          name="caption"
+          name="classification"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Caption</FormLabel>
+            <FormItem className="col-span-1">
+              <FormLabel>Classification</FormLabel>
+
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select classifications" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="New Product/Service">
+                    New Product/Service
+                  </SelectItem>
+                  <SelectItem value="Existing Product/Service">
+                    Existing Product/Service
+                  </SelectItem>
+                  <SelectItem value="Non-Product/Service Related">
+                    Non-Product/Service Related
+                  </SelectItem>
+                  <SelectItem value="Campaign">Campaign</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Select the type of classification for this campaign.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="target_audience"
+          render={({ field }) => (
+            <FormItem className="col-span-1">
+              <FormLabel>Target Audience</FormLabel>
               <FormControl>
-                <Input placeholder="Enter caption" {...field} />
+                <Input placeholder="Enter target audience" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -158,10 +199,34 @@ export function AdForms() {
           control={form.control}
           name="visual_descriptions"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-2">
               <FormLabel>Visual Descriptions</FormLabel>
               <FormControl>
-                <Input placeholder="Enter visual descriptions" {...field} />
+                <FormControl>
+                  <textarea
+                    className="flex min-h-[50px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="Enter your content here"
+                    {...field}
+                  />
+                </FormControl>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem className="col-span-2">
+              <FormLabel>Content</FormLabel>
+              <FormControl>
+                <textarea
+                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder="Enter your content here"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -171,7 +236,7 @@ export function AdForms() {
           control={form.control}
           name="disclaimers"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-1">
               <FormLabel>Disclaimers</FormLabel>
               <FormControl>
                 <Input placeholder="Enter disclaimers" {...field} />
@@ -180,7 +245,9 @@ export function AdForms() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <div className="col-span-2">
+          <Button type="submit">Submit</Button>
+        </div>
       </form>
     </Form>
   );

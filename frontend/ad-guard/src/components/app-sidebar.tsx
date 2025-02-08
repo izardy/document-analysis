@@ -18,6 +18,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -27,11 +30,28 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 
 // Menu items.
-const items = [
+interface NavItem {
+  title: string;
+  url: string;
+  isActive?: boolean;
+}
+
+const navMain = [
   {
-    title: "Marketing Checker",
-    url: "/marketing",
+    title: "Ad Guards",
     icon: Home,
+    items: [
+      {
+        title: "Submition Form",
+        url: "/marketing",
+        isActive: false,
+      },
+      {
+        title: "Results",
+        url: "/results",
+        isActive: false,
+      },
+    ],
   },
   {
     title: "Knowledge Base",
@@ -63,14 +83,36 @@ export function AppSidebar() {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                    <a
+                      href={item.url}
+                      className="flex items-center gap-2 font-medium"
+                    >
+                      {item.icon && <item.icon className="h-4 w-4" />}
+                      {item.title}
                     </a>
                   </SidebarMenuButton>
+                  {item.items?.length ? (
+                    <SidebarMenuSub>
+                      {item.items.map((item) => (
+                        <SidebarMenuSubItem key={item.title}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={item.isActive}
+                          >
+                            <a
+                              href={item.url}
+                              className="flex items-center gap-2"
+                            >
+                              {item.title}
+                            </a>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  ) : null}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
