@@ -3,10 +3,9 @@ import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
-import { TRPCReactProvider } from "@/trpc/react";
-
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { auth } from "@/server/auth";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ClientProviders } from "@/components/providers/client-providers";
 
 export const metadata: Metadata = {
   title: "Ad Guards | CARLS x CDX",
@@ -15,21 +14,19 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const session = await auth();
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <TRPCReactProvider>
-          <SidebarProvider>
-            <AppSidebar />
-            <main>
-              <SidebarTrigger />
-              {children}
-            </main>
-          </SidebarProvider>
-        </TRPCReactProvider>
+        <ClientProviders session={session}>
+          <main>
+            <SidebarTrigger />
+            {children}
+          </main>
+        </ClientProviders>
       </body>
     </html>
   );

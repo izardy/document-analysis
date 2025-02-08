@@ -3,10 +3,12 @@ import {
   ChevronUp,
   Home,
   Inbox,
+  LogIn,
   Search,
   Settings,
   User2,
 } from "lucide-react";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 import {
   Sidebar,
@@ -122,28 +124,42 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 /> Username
-                  <ChevronUp className="ml-auto" />
+            {(() => {
+              const { data: session } = useSession();
+
+              if (session) {
+                return (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuButton>
+                        <User2 /> {session.user?.name || "User"}
+                        <ChevronUp className="ml-auto" />
+                      </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      side="top"
+                      className="w-[--radix-popper-anchor-width]"
+                    >
+                      <DropdownMenuItem>
+                        <span>Account</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <span>Billing</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => signOut()}>
+                        <span>Sign out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                );
+              }
+
+              return (
+                <SidebarMenuButton onClick={() => signIn()}>
+                  <LogIn /> Sign In
                 </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem>
-                  <span>Account</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Billing</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              );
+            })()}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
