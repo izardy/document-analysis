@@ -48,7 +48,7 @@ const navMain = [
       },
       {
         title: "Results",
-        url: "/results",
+        url: "/marketing/results",
         isActive: false,
       },
     ],
