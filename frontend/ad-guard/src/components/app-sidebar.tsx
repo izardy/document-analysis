@@ -29,12 +29,12 @@ import {
 // Menu items.
 const items = [
   {
-    title: "Home",
+    title: "Marketing Checker",
     url: "#",
     icon: Home,
   },
   {
-    title: "Inbox",
+    title: "Knowledge Base",
     url: "#",
     icon: Inbox,
   },
