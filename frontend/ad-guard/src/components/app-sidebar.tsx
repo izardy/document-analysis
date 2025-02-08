@@ -30,12 +30,12 @@ import {
 const items = [
   {
     title: "Marketing Checker",
-    url: "#",
+    url: "/marketing",
     icon: Home,
   },
   {
     title: "Knowledge Base",
-    url: "#",
+    url: "/knowledge-base",
     icon: Inbox,
   },
   {
