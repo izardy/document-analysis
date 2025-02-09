@@ -32,14 +32,14 @@ export function AdForms() {
     campaign_name: z.string().min(2, {
       message: "Campaign name must be at least 2 characters.",
     }),
+    caption: z.string().min(2, {
+      message: "Caption must be at least 2 characters.",
+    }),
     target_audience: z.string().min(2, {
       message: "Target audience must be at least 2 characters.",
     }),
     platform: z.string().min(2, {
       message: "Platform selection is required.",
-    }),
-    caption: z.string().min(2, {
-      message: "Caption must be at least 2 characters.",
     }),
     visual_descriptions: z.string().min(2, {
       message: "Visual descriptions must be at least 2 characters.",

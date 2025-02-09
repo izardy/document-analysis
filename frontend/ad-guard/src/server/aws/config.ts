@@ -1,11 +1,12 @@
-import { BedrockAgentClient } from "@aws-sdk/client-bedrock-agent"; // ES Modules import
+import { BedrockAgentClient } from "@aws-sdk/client-bedrock-agent";
+import { BedrockAgentRuntimeClient } from "@aws-sdk/client-bedrock-agent-runtime"; // ES Modules import
+import { fromEnv } from "@aws-sdk/credential-providers";
 
 const config = {
   region: process.env.AWS_REGION || "", // AWS region where Bedrock is available
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "", // AWS access key ID
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "", // AWS secret access key
-  },
+  credentials: fromEnv(), // Use environment variables for AWS credentials
+  maxAttempts: 3,
 };
 
+export const clientBedrockAgent = new BedrockAgentRuntimeClient(config);
 export const client = new BedrockAgentClient(config);

@@ -1,0 +1,58 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeAgent",
+        "bedrock:InvokeModel",
+        "bedrock:ListAgents",
+        "bedrock:GetAgent",
+        "bedrock:ListAgentKnowledgeBases",
+        "bedrock:ListAgentCollaborators",
+        "bedrock:ListAgentAliases",
+        "bedrock:ListAgentActionGroups",
+        "bedrock:ListAgentVersions",
+        "bedrock:GetAgentActionGroup",
+        "bedrock:GetAgentAlias",
+        "bedrock:GetAgentCollaborator",
+        "bedrock:GetAgentKnowledgeBase",
+        "bedrock:GetAgentMemory",
+        "bedrock:GetAgentVersion",
+        "bedrock:InvokeInlineAgent",
+        "bedrock:PrepareAgent",
+        "bedrock:UpdateAgent",
+        "bedrock:UpdateAgentActionGroup",
+        "bedrock:UpdateAgentAlias",
+        "bedrock:UpdateAgentCollaborator",
+        "bedrock:UpdateAgentKnowledgeBase",
+        "bedrock:AssociateAgentCollaborator",
+        "bedrock:AssociateAgentKnowledgeBase",
+        "bedrock:CreateAgentActionGroup",
+        "bedrock:CreateAgent",
+        "bedrock:CreateAgentAlias",
+        "bedrock:DeleteAgent",
+        "bedrock:DeleteAgentAlias",
+        "bedrock:DeleteAgentActionGroup",
+        "bedrock:DeleteAgentMemory",
+        "bedrock:DeleteAgentVersion",
+        "bedrock:DisassociateAgentCollaborator",
+        "bedrock:AssociateThirdPartyKnowledgeBase",
+        "bedrock:CreateKnowledgeBase",
+        "bedrock:DeleteKnowledgeBase",
+        "bedrock:DeleteKnowledgeBaseDocuments",
+        "bedrock:IngestKnowledgeBaseDocuments",
+        "bedrock:DisassociateAgentKnowledgeBase",
+        "bedrock:UpdateKnowledgeBase",
+        "bedrock:ListKnowledgeBaseDocuments",
+        "bedrock:ListKnowledgeBases",
+        "bedrock:GetKnowledgeBase",
+        "bedrock:GetKnowledgeBaseDocuments"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:us-east-1:616334581497:agent-alias/OWTCLJJVSN/VHZKWGOD3I",
+        "arn:aws:bedrock:us-east-1:616334581497:agent/OWTCLJJVSN"
+      ]
+    }
+  ]
+}

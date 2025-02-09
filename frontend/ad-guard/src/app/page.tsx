@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
 
@@ -10,7 +11,10 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <div>First Page</div>
+      <div>
+        <Link href="/temporary-page">Temporary Page</Link>
+        <div>First Page</div>
+      </div>
     </HydrateClient>
   );
 }

@@ -2,12 +2,13 @@
   "compilerOptions": {
     /* Base Options: */
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "target": "es2022",
+    "skipLibCheck": false,
+    "target": "ESNext",
     "allowJs": true,
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
+    "useDefineForClassFields": false,
 
     /* Strictness */
     "strict": true,
@@ -15,10 +16,10 @@
     "checkJs": true,
 
     /* Bundled projects */
-    "lib": ["dom", "dom.iterable", "ES2022"],
+    "lib": ["dom", "dom.iterable", "ES2022", "ES2015"],
     "noEmit": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "jsx": "preserve",
     "plugins": [{ "name": "next" }],
     "incremental": true,

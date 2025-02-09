@@ -56,10 +56,23 @@ const navMain = [
     ],
   },
   {
-    title: "Knowledge Base",
-    url: "/knowledge-base",
-    icon: Inbox,
+    title: "Artificial Intelligence",
+    icon: Home,
+    items: [
+      {
+        title: "Knowledge Base",
+        url: "/knowledge-base",
+        isActive: false,
+      },
+      {
+        title: "Agents",
+        url: "/ai-agent",
+        icon: Inbox,
+        isActive: false,
+      },
+    ],
   },
+
   {
     title: "Calendar",
     url: "#",
