@@ -1,5 +1,5 @@
 # Use Case for Digital Document AI Analysis Tool
-## 1. Local Chatbot Companion 
+## 1. Local (LLM) Chatbot Companion 
 - [x] Started
 - [x] Progressing
 - [x] Completed
@@ -22,7 +22,7 @@
               |--- Use case 1 : Chat only w/o documentation
               |--- Use case 2 : Chat with documentation upload (txt, pdf, jpg, png)
 ```
-## 2. API Chatbot Companion 
+## 2. API (LLM) Chatbot Companion 
 - [x] Started
 - [x] Progressing
 - [ ] Completed
